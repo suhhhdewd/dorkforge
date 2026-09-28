@@ -12,6 +12,7 @@ def test_index_returns_html() -> None:
     assert resp.status_code == 200
     assert "text/html" in resp.headers["content-type"]
     assert "dork" in resp.text.lower()
+    assert "Rules of Engagement" in resp.text
 
 
 def test_build_broad_returns_rows() -> None:
@@ -62,7 +63,7 @@ def test_export_json_and_csv_non_empty() -> None:
     assert resp.status_code == 200
     assert "text/csv" in resp.headers["content-type"]
     assert resp.content
-    assert b"id,category,risk,surface,purpose,query,url" in resp.content
+    assert b"id,category,risk,surface,mode,advisory,purpose,query,url" in resp.content
 
 
 def test_serve_defaults_to_localhost() -> None:

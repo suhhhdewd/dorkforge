@@ -13,7 +13,17 @@ from dorkforge.selection import RenderedDork
 
 FORMATS: tuple[str, ...] = ("txt", "csv", "json", "markdown", "html")
 
-_FIELDS: tuple[str, ...] = ("id", "category", "risk", "surface", "purpose", "query", "url")
+_FIELDS: tuple[str, ...] = (
+    "id",
+    "category",
+    "risk",
+    "surface",
+    "mode",
+    "advisory",
+    "purpose",
+    "query",
+    "url",
+)
 
 CONTENT_TYPES: dict[str, str] = {
     "txt": "text/plain; charset=utf-8",

@@ -32,6 +32,15 @@ header {
 h1 { margin: 0; font-size: 1.8rem; letter-spacing: 0.5px; }
 .accent { color: var(--accent); }
 .tagline { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.9rem; max-width: 70ch; }
+.roe {
+  margin: 0.6rem 0 0;
+  padding: 0.4rem 0.7rem;
+  border-left: 3px solid var(--accent);
+  background: #1a1206;
+  color: var(--accent);
+  font-size: 0.82rem;
+  max-width: 90ch;
+}
 
 main { padding: 1.25rem 1.5rem; display: grid; gap: 1.25rem; }
 
@@ -113,6 +122,10 @@ th, td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(
 th { background: #111; color: var(--accent); position: sticky; top: 0; }
 td.query { font-family: "Cascadia Code", Consolas, monospace; color: #ffd9b3; word-break: break-word; }
 a { color: var(--accent); }
+
+.badge { display: inline-block; padding: 0.1rem 0.45rem; border-radius: 10px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; cursor: help; }
+.badge-targeted { background: #0d2a12; color: #6fdc8c; border: 1px solid #1f6b34; }
+.badge-broad { background: #2a1405; color: var(--accent); border: 1px solid var(--accent-dim); }
 
 .risk-Critical { color: var(--danger); font-weight: 700; }
 .risk-High { color: #ff8a3d; font-weight: 600; }

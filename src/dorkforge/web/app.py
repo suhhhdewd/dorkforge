@@ -14,14 +14,10 @@ from pydantic import BaseModel
 from dorkforge import __version__
 from dorkforge.export import CONTENT_TYPES, EXTENSIONS, FORMATS, serialize
 from dorkforge.library import load_dorks
+from dorkforge.safety import BROAD_NOTICE, ROE_BANNER
 from dorkforge.selection import select_and_render
 
 app = FastAPI(title="dorkforge", version=__version__)
-
-BROAD_NOTICE = (
-    "Broad results are internet-wide, third-party data, research-only. "
-    "Do not act on findings without authorization."
-)
 
 _STATIC = files("dorkforge.web").joinpath("static")
 
@@ -100,6 +96,7 @@ def api_build(req: BuildRequest) -> Response:
             "rows": [row.model_dump() for row in result.rows],
             "skipped": result.skipped,
             "broad": broad,
+            "roe": ROE_BANNER,
             "notice": BROAD_NOTICE if broad else None,
         }
     )

@@ -27,6 +27,7 @@ def test_targeted_build_with_authorized_returns_queries_and_urls() -> None:
     assert result.exit_code == 0
     assert "example.com" in result.stdout
     assert "google.com/search" in result.stdout
+    assert "Rules of Engagement" in result.stdout
 
 
 def test_broad_build_runs_without_authorized_and_shows_notice() -> None:
@@ -75,7 +76,9 @@ def test_export_writes_json_and_csv(tmp_path) -> None:
     )
     assert result.exit_code == 0
     assert csv_path.exists() and csv_path.stat().st_size > 0
-    assert "id,category,risk,surface,purpose,query,url" in csv_path.read_text(encoding="utf-8")
+    assert "id,category,risk,surface,mode,advisory,purpose,query,url" in csv_path.read_text(
+        encoding="utf-8"
+    )
 
 
 def test_filter_narrows_by_surface() -> None:

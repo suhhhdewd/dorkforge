@@ -9,16 +9,24 @@ from pydantic import BaseModel
 
 from dorkforge.core import filter_dorks, render, to_broad
 from dorkforge.models import Dork
+from dorkforge.safety import BROAD_ADVISORY, TARGETED_ADVISORY
 from dorkforge.urls import build_url
 
 
 class RenderedDork(BaseModel):
-    """One rendered result: the dork's identity plus its query and search URL."""
+    """One rendered result: the dork's identity plus its query and search URL.
+
+    ``mode`` and ``advisory`` carry the authorization/status tag with every row
+    so the broad, third-party, research-only nature is explicit on each result
+    and in exports, not only in a single banner line.
+    """
 
     id: int
     category: str
     risk: str
     surface: str
+    mode: str
+    advisory: str
     purpose: str
     query: str
     url: str
@@ -60,6 +68,9 @@ def select_and_render(
         text=text,
     )
 
+    mode = "broad" if broad else "targeted"
+    advisory = BROAD_ADVISORY if broad else TARGETED_ADVISORY
+
     rows: list[RenderedDork] = []
     skipped = 0
     for dork in matched:
@@ -85,6 +96,8 @@ def select_and_render(
                 category=dork.category,
                 risk=dork.risk,
                 surface=dork.surface,
+                mode=mode,
+                advisory=advisory,
                 purpose=dork.purpose,
                 query=query,
                 url=build_url(dork.surface, query),

@@ -7,10 +7,14 @@ operators ("dorks") into ready-to-run query strings and clickable search URLs.
 ## Hard constraints (non-negotiable)
 
 1. **v1 is EMIT-ONLY.** dorkforge generates query strings and search URLs.
-   It makes **NO network requests** to search engines or targets. **No
-   scraping**, no fetching result pages, no "preview" requests, no link
-   checking. The only network listener allowed is the local web GUI bound to
-   `127.0.0.1`.
+   At **runtime it makes NO network requests** to search engines or targets —
+   **no scraping**, no fetching result pages, no "preview" requests, no link
+   checking — and it ships **no HTTP client in its runtime dependencies**. The
+   only network listener allowed is the local web GUI bound to `127.0.0.1`.
+   A **test-only** HTTP client (`httpx`, used by FastAPI's `TestClient`
+   in-process against the ASGI app, with no real network) is permitted in the
+   `dev` extra only. The `test_no_network` guard proves the runtime does not
+   open outbound connections.
 2. **Live execution is v2 and NOT implemented.** Execution via official APIs
    (Google Programmable Search / CSE, Shodan, etc.) must be designed as a
    pluggable interface now (`src/dorkforge/executors/base.py`), but no

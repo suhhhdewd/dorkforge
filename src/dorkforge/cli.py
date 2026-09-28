@@ -11,6 +11,7 @@ from rich.table import Table
 from dorkforge import __version__
 from dorkforge.export import FORMATS, serialize
 from dorkforge.library import load_dorks
+from dorkforge.safety import BROAD_NOTICE, ROE_BANNER
 from dorkforge.selection import select_and_render
 
 app = typer.Typer(
@@ -19,11 +20,6 @@ app = typer.Typer(
     no_args_is_help=True,
 )
 console = Console()
-
-BROAD_NOTICE = (
-    "Note: broad results are internet-wide, third-party data, research-only. "
-    "Do not act on findings without authorization."
-)
 
 
 @app.callback()
@@ -121,6 +117,8 @@ def build(
     limit: Annotated[int | None, typer.Option(help="Cap the number of rows shown.")] = None,
 ) -> None:
     """Generate rendered queries and clickable search URLs for matching dorks."""
+    console.print(f"[dim]{ROE_BANNER}[/dim]")
+
     if not broad:
         _require_authorization(authorized)
 
@@ -148,7 +146,7 @@ def build(
     render_console = console if console.is_terminal else Console(width=1000)
 
     table = Table(title="dorkforge queries")
-    for col in ("id", "category", "risk", "surface", "query", "url"):
+    for col in ("id", "category", "risk", "surface", "mode", "query", "url"):
         table.add_column(col)
     for row in shown:
         table.add_row(
@@ -156,6 +154,7 @@ def build(
             row.category,
             row.risk,
             row.surface,
+            row.mode,
             row.query,
             row.url,
         )
@@ -202,6 +201,8 @@ def export(
     ] = None,
 ) -> None:
     """Write rendered queries and URLs for matching dorks to a file."""
+    console.print(f"[dim]{ROE_BANNER}[/dim]")
+
     if fmt not in FORMATS:
         raise typer.BadParameter(f"--format must be one of {list(FORMATS)}")
 

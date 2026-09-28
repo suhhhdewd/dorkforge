@@ -63,6 +63,14 @@ function renderRows(rows) {
       tr.appendChild(td);
     }
 
+    const modeTd = document.createElement("td");
+    const badge = document.createElement("span");
+    badge.className = "badge badge-" + r.mode;
+    badge.textContent = r.mode;
+    badge.title = r.advisory;
+    modeTd.appendChild(badge);
+    tr.appendChild(modeTd);
+
     const q = document.createElement("td");
     q.className = "query";
     q.textContent = r.query;
