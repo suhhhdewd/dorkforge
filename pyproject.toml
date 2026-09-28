@@ -53,8 +53,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/USER/dorkforge"
-Repository = "https://github.com/USER/dorkforge"
+Homepage = "https://github.com/suhhhdewd/dorkforge"
+Repository = "https://github.com/suhhhdewd/dorkforge"
 
 [project.scripts]
 dorkforge = "dorkforge.cli:app"

@@ -35,7 +35,7 @@ Install the CLI in an isolated environment with [pipx](https://pipx.pypa.io/),
 from a local clone:
 
 ```bash
-git clone https://github.com/USER/dorkforge.git
+git clone https://github.com/suhhhdewd/dorkforge.git
 cd dorkforge
 pipx install .
 dorkforge --help
