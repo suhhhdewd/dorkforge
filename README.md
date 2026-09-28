@@ -4,6 +4,11 @@ Emit-only search-query generator for **authorized** security recon and
 **personal footprint self-audit**. dorkforge turns a curated library of search
 operators ("dorks") into ready-to-run query strings and clickable search URLs.
 
+**Why:** good reconnaissance and footprint self-audit means knowing the right
+search operators and composing them correctly. dorkforge keeps a curated,
+categorized library and does that composition for you — and it stops there. It
+**generates queries and never executes them**; you open the links yourself.
+
 > **Status:** v0.1.0.
 
 ## What it does (and doesn't)
@@ -24,7 +29,19 @@ Use it only against scopes you own or are explicitly authorized to assess.
 - **broad** — no scope; generic operator queries. Results are internet-wide,
   third-party, research-only, and every row is tagged as such.
 
-## Install (dev)
+## Install
+
+Install the CLI in an isolated environment with [pipx](https://pipx.pypa.io/),
+from a local clone:
+
+```bash
+git clone https://github.com/USER/dorkforge.git
+cd dorkforge
+pipx install .
+dorkforge --help
+```
+
+For development (editable install with test and lint tools):
 
 ```bash
 python -m venv .venv
@@ -51,6 +68,24 @@ dorkforge export --authorized --target example.com --format csv --out out.csv
 # Local web GUI (binds to 127.0.0.1:8765)
 dorkforge serve
 ```
+
+## Screenshots
+
+The local web GUI (`dorkforge serve`) in broad mode:
+
+![dorkforge web GUI](docs/screenshot.png)
+
+## Roadmap
+
+Planned for **v2** — **not yet implemented**:
+
+- **Live execution via official APIs** — run generated queries through official,
+  authenticated provider APIs (e.g. Google Programmable Search / CSE, Shodan,
+  Censys) behind the existing `executors/` interface. Never by scraping.
+- **Person / self-search mode** — a guided footprint self-audit flow around your
+  own names, handles, and domains.
+- **Physical-recon module** — currently out of scope; if ever added it will be a
+  clearly separated, opt-in module.
 
 ## Authorized use
 
