@@ -2,6 +2,7 @@ import pytest
 
 from dorkforge.core import PLACEHOLDER_VOCAB, filter_dorks, render, to_broad
 from dorkforge.models import Dork
+from dorkforge.selection import select_and_render
 
 
 def make_dork(**overrides) -> Dork:
@@ -126,3 +127,20 @@ def test_filter_by_text_is_case_insensitive() -> None:
 
 def test_vocab_is_exact() -> None:
     assert set(PLACEHOLDER_VOCAB) == {"asn", "company", "domain", "ip", "name", "socialplatform"}
+
+
+def test_scope_only_dork_skipped_in_broad_mode() -> None:
+    # A scope-only dork broadens to an empty query and must be skipped + counted.
+    scope_only = make_dork(
+        id=545,
+        query='domain="[domain]"',
+        surface="FOFA",
+        placeholders=["domain"],
+        broad_capable=True,
+    )
+    keeper = make_dork(id=1, query="site:[domain] inurl:admin", surface="Google")
+
+    result = select_and_render([scope_only, keeper], broad=True)
+
+    assert [row.id for row in result.rows] == [1]
+    assert result.skipped == 1

@@ -12,10 +12,8 @@ from rich.console import Console
 from rich.table import Table
 
 from dorkforge import __version__
-from dorkforge.core import filter_dorks, render, to_broad
 from dorkforge.library import load_dorks
-from dorkforge.models import Dork
-from dorkforge.urls import build_url
+from dorkforge.selection import RenderedDork, select_and_render
 
 app = typer.Typer(
     name="dorkforge",
@@ -74,46 +72,6 @@ def _collect_values(
     return {token: value for token, value in raw.items() if value is not None}
 
 
-class _Row(dict):
-    """A rendered result row: id, category, risk, surface, query, url, purpose."""
-
-
-def _build_rows(
-    dorks: list[Dork],
-    *,
-    broad: bool,
-    values: dict[str, str],
-    tld: str | None,
-    country: str | None,
-) -> tuple[list[_Row], int]:
-    """Render matching dorks into rows, returning (rows, skipped_count)."""
-    rows: list[_Row] = []
-    skipped = 0
-    for dork in dorks:
-        if broad:
-            if not dork.broad_capable:
-                skipped += 1
-                continue
-            query = to_broad(dork, tld=tld, country=country)
-        else:
-            if set(dork.placeholders) - set(values):
-                skipped += 1
-                continue
-            query = render(dork, values)
-        rows.append(
-            _Row(
-                id=dork.id,
-                category=dork.category,
-                risk=dork.risk,
-                surface=dork.surface,
-                query=query,
-                url=build_url(dork.surface, query),
-                purpose=dork.purpose,
-            )
-        )
-    return rows, skipped
-
-
 @app.command(name="list")
 def list_() -> None:
     """Summarize the library: counts by category, by surface, and the total."""
@@ -168,15 +126,19 @@ def build(
     if not broad:
         _require_authorization(authorized)
 
-    dorks = filter_dorks(
+    values = _collect_values(target, company, ip, asn, name)
+    result = select_and_render(
         load_dorks(),
+        broad=broad,
+        values=values,
         category=category,
         risk=risk,
         surface=surface,
         text=text,
+        tld=tld,
+        country=country,
     )
-    values = _collect_values(target, company, ip, asn, name)
-    rows, skipped = _build_rows(dorks, broad=broad, values=values, tld=tld, country=country)
+    rows = result.rows
 
     if broad:
         console.print(f"[yellow]{BROAD_NOTICE}[/yellow]")
@@ -192,29 +154,31 @@ def build(
         table.add_column(col)
     for row in shown:
         table.add_row(
-            str(row["id"]),
-            row["category"],
-            row["risk"],
-            row["surface"],
-            row["query"],
-            row["url"],
+            str(row.id),
+            row.category,
+            row.risk,
+            row.surface,
+            row.query,
+            row.url,
         )
     render_console.print(table)
 
     if limit is not None and len(rows) > limit:
         console.print(f"Showing {limit} of {len(rows)} matching dorks.")
 
-    if skipped:
+    if result.skipped:
         if broad:
-            console.print(f"Skipped {skipped} dorks that are not broad-capable.")
+            console.print(
+                f"Skipped {result.skipped} dorks (not broad-capable or empty when broadened)."
+            )
         else:
-            console.print(f"skipped {skipped} dorks needing values you did not supply")
+            console.print(f"skipped {result.skipped} dorks needing values you did not supply")
 
 
-def _serialize(rows: list[_Row], fmt: str) -> str:
+def _serialize(rows: list[RenderedDork], fmt: str) -> str:
     """Serialize export rows to the requested format."""
     fields = ("id", "category", "risk", "surface", "purpose", "query", "url")
-    records = [{k: row[k] for k in fields} for row in rows]
+    records = [{k: getattr(row, k) for k in fields} for row in rows]
 
     if fmt == "json":
         return json.dumps(records, indent=2)
@@ -299,20 +263,23 @@ def export(
     if not broad:
         _require_authorization(authorized)
 
-    dorks = filter_dorks(
+    values = _collect_values(target, company, ip, asn, name)
+    result = select_and_render(
         load_dorks(),
+        broad=broad,
+        values=values,
         category=category,
         risk=risk,
         surface=surface,
         text=text,
+        tld=tld,
+        country=country,
     )
-    values = _collect_values(target, company, ip, asn, name)
-    rows, skipped = _build_rows(dorks, broad=broad, values=values, tld=tld, country=country)
 
-    out.write_text(_serialize(rows, fmt), encoding="utf-8")
+    out.write_text(_serialize(result.rows, fmt), encoding="utf-8")
 
     if broad:
         console.print(f"[yellow]{BROAD_NOTICE}[/yellow]")
-    console.print(f"Wrote {len(rows)} dorks to {out} ({fmt}).")
-    if skipped:
-        console.print(f"Skipped {skipped} dorks.")
+    console.print(f"Wrote {len(result.rows)} dorks to {out} ({fmt}).")
+    if result.skipped:
+        console.print(f"Skipped {result.skipped} dorks.")
