@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>dorkforge</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body>
+  <header>
+    <h1>dork<span class="accent">forge</span></h1>
+    <p class="tagline">Emit-only query generator &mdash; authorized recon &amp; personal footprint self-audit. No searches are run; links open in your browser.</p>
+  </header>
+
+  <main>
+    <section class="controls">
+      <div class="mode-row">
+        <label class="mode-toggle">
+          <input type="radio" name="mode" value="targeted" checked /> Targeted
+        </label>
+        <label class="mode-toggle">
+          <input type="radio" name="mode" value="broad" /> Broad
+        </label>
+      </div>
+
+      <fieldset class="filters">
+        <legend>Filters</legend>
+        <label>Category <input id="f-category" type="text" placeholder="e.g. Admin &amp; Login Panels" /></label>
+        <label>Risk
+          <select id="f-risk">
+            <option value="">any</option>
+            <option>Critical</option>
+            <option>High</option>
+            <option>Medium</option>
+            <option>Low</option>
+            <option>Info</option>
+          </select>
+        </label>
+        <label>Surface
+          <select id="f-surface">
+            <option value="">any</option>
+            <option>Google</option>
+            <option>Bing</option>
+            <option>DuckDuckGo</option>
+            <option>Shodan</option>
+            <option>Censys</option>
+            <option>FOFA</option>
+            <option>GitHub</option>
+            <option>GitLab</option>
+          </select>
+        </label>
+        <label>Text search <input id="f-text" type="text" placeholder="substring in query/purpose/description" /></label>
+      </fieldset>
+
+      <fieldset class="values" id="targeted-values">
+        <legend>Target values (targeted mode)</legend>
+        <label>domain <input id="v-domain" type="text" placeholder="example.com" /></label>
+        <label>company <input id="v-company" type="text" /></label>
+        <label>ip <input id="v-ip" type="text" /></label>
+        <label>asn <input id="v-asn" type="text" /></label>
+        <label>name <input id="v-name" type="text" /></label>
+      </fieldset>
+
+      <fieldset class="broad-only" id="broad-values" hidden>
+        <legend>Broad narrowing (optional)</legend>
+        <label>tld <input id="b-tld" type="text" placeholder="*.gov" /></label>
+        <label>country <input id="b-country" type="text" placeholder="US" /></label>
+      </fieldset>
+
+      <label class="auth" id="auth-row">
+        <input id="authorized" type="checkbox" /> I am authorized to test this target
+      </label>
+
+      <div class="actions">
+        <button id="build-btn" type="button">Build queries</button>
+        <span class="export-group">
+          Export:
+          <button class="export-btn" data-format="csv" type="button">csv</button>
+          <button class="export-btn" data-format="json" type="button">json</button>
+          <button class="export-btn" data-format="markdown" type="button">markdown</button>
+          <button class="export-btn" data-format="html" type="button">html</button>
+        </span>
+      </div>
+    </section>
+
+    <section class="output">
+      <p id="notice" class="notice" hidden></p>
+      <p id="status" class="status"></p>
+      <table id="results" hidden>
+        <thead>
+          <tr>
+            <th>id</th><th>category</th><th>risk</th><th>surface</th>
+            <th>query</th><th>purpose</th><th>url</th><th></th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <script src="/app.js"></script>
+</body>
+</html>

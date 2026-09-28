@@ -1,0 +1,120 @@
+:root {
+  --bg: #0a0a0a;
+  --panel: #151515;
+  --panel-2: #1e1e1e;
+  --border: #333;
+  --text: #ececec;
+  --muted: #9a9a9a;
+  --accent: #ff7a18;
+  --accent-dim: #b35310;
+  --danger: #ff4d4d;
+}
+
+* { box-sizing: border-box; }
+
+/* Author display rules (e.g. .values { display: grid }) would otherwise beat
+   the UA [hidden] rule, so make hidden win explicitly. */
+[hidden] { display: none !important; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 15px/1.5 "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+header {
+  padding: 1.2rem 1.5rem;
+  border-bottom: 2px solid var(--accent);
+  background: linear-gradient(180deg, #111 0%, var(--bg) 100%);
+}
+
+h1 { margin: 0; font-size: 1.8rem; letter-spacing: 0.5px; }
+.accent { color: var(--accent); }
+.tagline { margin: 0.35rem 0 0; color: var(--muted); font-size: 0.9rem; max-width: 70ch; }
+
+main { padding: 1.25rem 1.5rem; display: grid; gap: 1.25rem; }
+
+fieldset {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  margin: 0;
+  padding: 0.75rem 1rem 1rem;
+}
+legend { color: var(--accent); font-weight: 600; padding: 0 0.4rem; }
+
+.controls { display: grid; gap: 1rem; }
+
+.mode-row { display: flex; gap: 1.5rem; }
+.mode-toggle { cursor: pointer; font-weight: 600; }
+
+.filters, .values, .broad-only {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+label { display: grid; gap: 0.25rem; font-size: 0.85rem; color: var(--muted); }
+
+input[type="text"], select {
+  background: var(--panel-2);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.9rem;
+}
+input[type="text"]:focus, select:focus { outline: 1px solid var(--accent); border-color: var(--accent); }
+
+.auth {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text);
+  font-weight: 600;
+}
+.auth input { width: 18px; height: 18px; accent-color: var(--accent); }
+
+.actions { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+.export-group { color: var(--muted); font-size: 0.85rem; }
+
+button {
+  background: var(--accent);
+  color: #111;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+button:hover { background: #ff9040; }
+.export-btn { background: var(--panel-2); color: var(--accent); border: 1px solid var(--accent-dim); padding: 0.35rem 0.7rem; }
+.export-btn:hover { background: #262019; }
+.copy-btn { background: var(--panel-2); color: var(--accent); border: 1px solid var(--accent-dim); padding: 0.2rem 0.55rem; font-size: 0.8rem; }
+
+.notice {
+  background: #241505;
+  border: 1px solid var(--accent-dim);
+  color: var(--accent);
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+}
+.status { color: var(--muted); }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+th, td { text-align: left; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); vertical-align: top; font-size: 0.85rem; }
+th { background: #111; color: var(--accent); position: sticky; top: 0; }
+td.query { font-family: "Cascadia Code", Consolas, monospace; color: #ffd9b3; word-break: break-word; }
+a { color: var(--accent); }
+
+.risk-Critical { color: var(--danger); font-weight: 700; }
+.risk-High { color: #ff8a3d; font-weight: 600; }
+.risk-Medium { color: #ffd24d; }
+.risk-Low { color: var(--muted); }

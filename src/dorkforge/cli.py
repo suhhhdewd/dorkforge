@@ -1,8 +1,5 @@
 """Typer CLI entry point."""
 
-import csv
-import io
-import json
 from collections import Counter
 from pathlib import Path
 from typing import Annotated
@@ -12,8 +9,9 @@ from rich.console import Console
 from rich.table import Table
 
 from dorkforge import __version__
+from dorkforge.export import FORMATS, serialize
 from dorkforge.library import load_dorks
-from dorkforge.selection import RenderedDork, select_and_render
+from dorkforge.selection import select_and_render
 
 app = typer.Typer(
     name="dorkforge",
@@ -175,58 +173,6 @@ def build(
             console.print(f"skipped {result.skipped} dorks needing values you did not supply")
 
 
-def _serialize(rows: list[RenderedDork], fmt: str) -> str:
-    """Serialize export rows to the requested format."""
-    fields = ("id", "category", "risk", "surface", "purpose", "query", "url")
-    records = [{k: getattr(row, k) for k in fields} for row in rows]
-
-    if fmt == "json":
-        return json.dumps(records, indent=2)
-
-    if fmt == "csv":
-        buffer = io.StringIO()
-        writer = csv.DictWriter(buffer, fieldnames=fields)
-        writer.writeheader()
-        writer.writerows(records)
-        return buffer.getvalue()
-
-    if fmt == "txt":
-        lines = []
-        for r in records:
-            lines.append(f"[{r['id']}] {r['category']} | {r['risk']} | {r['surface']}")
-            lines.append(f"  purpose: {r['purpose']}")
-            lines.append(f"  query:   {r['query']}")
-            lines.append(f"  url:     {r['url']}")
-            lines.append("")
-        return "\n".join(lines)
-
-    if fmt == "markdown":
-        header = "| " + " | ".join(fields) + " |"
-        sep = "| " + " | ".join("---" for _ in fields) + " |"
-        body = [
-            "| " + " | ".join(str(r[k]).replace("|", "\\|") for k in fields) + " |" for r in records
-        ]
-        return "\n".join([header, sep, *body]) + "\n"
-
-    if fmt == "html":
-        from html import escape
-
-        head = "".join(f"<th>{escape(k)}</th>" for k in fields)
-        body_rows = []
-        for r in records:
-            cells = "".join(f"<td>{escape(str(r[k]))}</td>" for k in fields)
-            body_rows.append(f"<tr>{cells}</tr>")
-        return (
-            "<table>\n<thead><tr>"
-            + head
-            + "</tr></thead>\n<tbody>\n"
-            + "\n".join(body_rows)
-            + "\n</tbody>\n</table>\n"
-        )
-
-    raise typer.BadParameter(f"unknown format '{fmt}'")
-
-
 @app.command()
 def export(
     out: Annotated[Path, typer.Option(help="Destination file path.")],
@@ -256,9 +202,8 @@ def export(
     ] = None,
 ) -> None:
     """Write rendered queries and URLs for matching dorks to a file."""
-    allowed = {"txt", "csv", "json", "markdown", "html"}
-    if fmt not in allowed:
-        raise typer.BadParameter(f"--format must be one of {sorted(allowed)}")
+    if fmt not in FORMATS:
+        raise typer.BadParameter(f"--format must be one of {list(FORMATS)}")
 
     if not broad:
         _require_authorization(authorized)
@@ -276,10 +221,24 @@ def export(
         country=country,
     )
 
-    out.write_text(_serialize(result.rows, fmt), encoding="utf-8")
+    out.write_text(serialize(result.rows, fmt), encoding="utf-8")
 
     if broad:
         console.print(f"[yellow]{BROAD_NOTICE}[/yellow]")
     console.print(f"Wrote {len(result.rows)} dorks to {out} ({fmt}).")
     if result.skipped:
         console.print(f"Skipped {result.skipped} dorks.")
+
+
+@app.command()
+def serve(
+    host: Annotated[
+        str, typer.Option(help="Interface to bind (localhost by default).")
+    ] = "127.0.0.1",
+    port: Annotated[int, typer.Option(help="Port to listen on.")] = 8765,
+) -> None:
+    """Run the local web GUI (bound to 127.0.0.1 by default, per CLAUDE.md)."""
+    import uvicorn
+
+    console.print(f"dorkforge web GUI on http://{host}:{port}  (Ctrl+C to stop)")
+    uvicorn.run("dorkforge.web.app:app", host=host, port=port, log_level="info")

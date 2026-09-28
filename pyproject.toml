@@ -24,6 +24,11 @@ dependencies = [
 dev = [
     "pytest>=8.0",
     "ruff>=0.5",
+    # Test-only. Required by Starlette/FastAPI's TestClient; runs in-process
+    # against the ASGI app and makes no real network calls. Not a runtime dep,
+    # so the v1 "no HTTP client" constraint (which targets search-engine/target
+    # traffic) is preserved.
+    "httpx>=0.27",
 ]
 
 [project.scripts]
