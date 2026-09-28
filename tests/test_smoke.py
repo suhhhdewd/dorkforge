@@ -25,4 +25,5 @@ def test_no_executors_implemented() -> None:
 
 def test_dork_library_is_packaged() -> None:
     data = yaml.safe_load(files("dorkforge.data").joinpath("dorks.yaml").read_text())
-    assert "dorks" in data
+    assert isinstance(data, list)
+    assert len(data) == 599
